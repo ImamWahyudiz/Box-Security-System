@@ -110,34 +110,17 @@ Edit `config.h`:
 ```cpp
 const char* WIFI_SSID = "Your_WiFi_SSID";
 const char* WIFI_PASSWORD = "Your_WiFi_Password";
-#define TELEGRAM_BOT_TOKEN "123456789:ABC..."
-#define TELEGRAM_CHAT_ID "987654321"
+#define TELEGRAM_BOT_TOKEN "xxxxxxx:xxxxxxxxxxxxxxx"
+#define TELEGRAM_CHAT_ID "xxxxxxxxxx"
 ```
 
 ### 4. Upload & Run
 
-1. Open `security_monitoring_system_v2.ino`
+1. Open `Box-Security-Monitoring.ino`
 2. Select Board: ESP32 Dev Module
 3. Select Port
 4. Click Upload
 5. Monitor via Serial Monitor (115200 baud)
-
-## 📂 Project Structure
-
-```
-sketch_nov17b/
-├── security_monitoring_system_v2.ino  # Main program
-├── config.h                            # Configuration file
-├── src/
-│   ├── wifi_manager.h                  # WiFi connection handler
-│   ├── telegram_manager.h              # Telegram bot manager
-│   ├── sensor_handler.h                # Sensor logic
-│   └── utils.h                         # Utility functions
-├── docs/
-│   ├── INSTALLATION.md                 # Installation guide
-│   └── USER_GUIDE.md                   # User manual
-└── README.md                           # This file
-```
 
 ## 🎯 How It Works
 

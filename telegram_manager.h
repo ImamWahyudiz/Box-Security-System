@@ -90,8 +90,6 @@ void handleTelegramMessages() {
       bot.sendMessage(TELEGRAM_CHAT_ID, "💤 Sistem DISARMED\n\n🔓 Mode sleep - hemat energi\n🔇 Sensor tidak dibaca\n⚡ Konsumsi daya minimal\n\nKetik /arm untuk aktifkan kembali", "");
       Serial.println("✓ Sistem DISARMED via Telegram - masuk mode hemat energi");
     }
-      Serial.println("✓ Sistem DISARMED via Telegram - masuk mode hemat energi");
-    }
     else {
       bot.sendMessage(TELEGRAM_CHAT_ID, "❓ Command tidak dikenal\n\nKetik /help untuk melihat daftar command", "");
     }

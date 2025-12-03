@@ -257,7 +257,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 👥 Authors
 
-- **Apachersa** - Initial work
+- **Imam Wahyudi, Azka Giovani, Firja Algifari** - 
 
 ## 🙏 Acknowledgments
 
@@ -276,4 +276,4 @@ For issues, questions, or suggestions:
 
 **⭐ If this project helps you, please consider giving it a star!**
 
-Made with ❤️ by Apachersa
+Made with ❤️ by Our Team

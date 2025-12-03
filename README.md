@@ -30,6 +30,56 @@ Sistem monitoring keamanan real-time untuk kotak/peti penyimpanan menggunakan ES
 | **Power** | USB 5V / Power Bank / Adaptor |
 | **Accessories** | Jumper wires, Magnet |
 
+### 🔄 Alternative Sensors (Recommended Upgrades)
+
+Untuk hasil yang lebih akurat dan reliable, pertimbangkan upgrade ke sensor berikut:
+
+#### **1. Door/Box Opening Detection:**
+
+**🔵 Reed Switch (Recommended)**
+- **Keunggulan:**
+  - Lebih sensitif dan konsisten dari Hall Effect
+  - Ukuran lebih kecil, mudah dipasang pada pintu/tutup kotak
+  - Harga terjangkau (~Rp 2.000-5.000)
+  - Kontak fisik = akurasi 100%
+- **Contoh:** Reed Switch MC-38 / Door Magnetic Sensor
+- **Wiring:** 2 pin (NO/NC), sama seperti switch biasa
+- **Code Change:** Minimal, hanya ubah logika HIGH/LOW jika perlu
+
+**⚡ Alternatif:**
+- **Limit Switch** - Untuk tutup kotak yang menekan sensor
+- **Optical Sensor** (IR Transmitter/Receiver) - Tanpa kontak fisik
+
+#### **2. Motion/Tilt Detection:**
+
+**🌀 MPU6050 Gyroscope + Accelerometer (Highly Recommended)**
+- **Keunggulan:**
+  - Data gerakan 6-axis (3-axis gyro + 3-axis accel)
+  - Deteksi rotasi, getaran, dan orientasi yang presisi
+  - Bisa tentukan sudut kemiringan exact
+  - Komunikasi I2C, mudah diprogram
+  - Harga terjangkau (~Rp 15.000-30.000)
+- **Library:** MPU6050 by Electronic Cats
+- **Use Case:** Deteksi kotak diangkat, dimiringkan, diguncang
+
+**⚙️ Alternatif:**
+- **ADXL345** - Accelerometer 3-axis (lebih murah)
+- **Vibration Sensor SW-420** - Deteksi getaran sederhana
+- **Tilt Switch SW-520D** - Upgrade dari mercury switch (lebih aman)
+
+#### **💡 Configuration Tips:**
+
+Jika menggunakan sensor alternatif, ubah di `config.h`:
+```cpp
+// Contoh untuk Reed Switch (aktif LOW saat tertutup)
+#define HALL_SENSOR_INVERTED false
+
+// Untuk MPU6050, tambahkan threshold
+#define MOTION_THRESHOLD 5.0  // Sensitivity level
+```
+
+Untuk implementasi MPU6050, lihat folder `examples/mpu6050_integration/`
+
 ## 🔧 Quick Start
 
 ### 1. Install Arduino IDE & Libraries

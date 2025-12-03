@@ -1,6 +1,9 @@
 # Sistem Monitoring Keamanan Kotak
 ## Security Box Monitoring System
 
+> 📚 **Academic Project Notice**  
+> Proyek ini dibuat sebagai **Tugas Akhir Semester 3** untuk mata kuliah **Organisasi Komputer**
+
 ![Version](https://img.shields.io/badge/version-1.0-blue.svg)
 ![Platform](https://img.shields.io/badge/platform-ESP32-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
@@ -173,15 +176,6 @@ For detailed troubleshooting, see [INSTALLATION.md](docs/INSTALLATION.md)
 - **Telegram** account for notifications
 - **Arduino IDE** 1.8.x or newer
 
-## 🤝 Contributing
-
-Contributions are welcome! To contribute:
-
-1. Fork the repository
-2. Create feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open Pull Request
 
 ## 📝 Changelog
 
@@ -199,7 +193,7 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 👥 Authors
 
-- **IoT Security Team** - Initial work
+- **Apachersa** - Initial work
 
 ## 🙏 Acknowledgments
 
@@ -218,4 +212,4 @@ For issues, questions, or suggestions:
 
 **⭐ If this project helps you, please consider giving it a star!**
 
-Made with ❤️ by IoT Security Team
+Made with ❤️ by Apachersa

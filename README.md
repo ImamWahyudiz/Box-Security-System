@@ -16,6 +16,8 @@ Sistem monitoring keamanan real-time untuk kotak/peti penyimpanan menggunakan ES
 - 🧲 **Hall Effect Sensor** - Deteksi pembukaan kotak dengan sensor magnetik
 - 📐 **Motion Detection** - Deteksi gerakan dan kemiringan kotak
 - 🤖 **Telegram Bot** - Notifikasi langsung ke smartphone Anda
+- 🔐 **Remote Control** - Arm/Disarm sistem via command Telegram (/arm, /disarm, /sleep)
+- 💤 **Sleep Mode** - Mode hemat energi dengan monitoring dinonaktifkan
 - 📊 **Periodic Reports** - Status report otomatis setiap 30 detik
 - 🔋 **Low Power** - Efisien untuk operasi 24/7
 - 🛡️ **Smart Detection** - Anti false alarm dengan stabilization time
@@ -155,7 +157,25 @@ sketch_nov17b/
 
 ## 📱 Telegram Notifications
 
-### Alert Types
+### 🎮 Remote Control Commands
+
+Kontrol sistem dari Telegram dengan commands berikut:
+
+| Command | Function | Description |
+|---------|----------|-------------|
+| `/start` | Help Menu | Tampilkan daftar command |
+| `/help` | Help Menu | Tampilkan daftar command |
+| `/status` | System Status | Cek status sistem (armed/sleep, uptime, WiFi) |
+| `/arm` | Activate | Aktifkan monitoring (sensor dibaca, alert aktif) |
+| `/disarm` | Deactivate | Nonaktifkan monitoring (sleep mode) |
+| `/sleep` | Sleep Mode | Mode hemat energi (sensor tidak dibaca) |
+
+**💡 Tips:**
+- Gunakan `/sleep` saat kotak tidak perlu dipantau (hemat baterai)
+- Kirim `/arm` untuk aktifkan kembali monitoring
+- `/status` untuk cek apakah sistem armed atau sleep
+
+### 🚨 Alert Types
 
 | Icon | Type | Trigger | Priority |
 |------|------|---------|----------|
@@ -168,12 +188,22 @@ sketch_nov17b/
 ### Example Notifications
 
 ```
-🚨 ALERT: KOTAK DIBUKA!
+🚨 ALERT: KOTAK TERBUKA!
 ━━━━━━━━━━━━━━━━━━━━━
-🧲 Sensor Hall: Magnet menjauh
-📦 Status: KOTAK TERBUKA
+📬 Status: TERBUKA
 ━━━━━━━━━━━━━━━━━━━━━
 ⏰ Waktu: 14:32:15
+```
+
+**Sleep Mode Response:**
+```
+💤 Sistem DISARMED
+
+🔓 Mode sleep - hemat energi
+🔇 Sensor tidak dibaca
+⚡ Konsumsi daya minimal
+
+Ketik /arm untuk aktifkan kembali
 ```
 
 ## ⚙️ Configuration
@@ -210,7 +240,6 @@ For detailed troubleshooting, see [INSTALLATION.md](docs/INSTALLATION.md)
 
 - **[Installation Guide](docs/INSTALLATION.md)** - Detailed setup instructions
 - **[User Guide](docs/USER_GUIDE.md)** - How to use the system
-- **[API Reference](src/)** - Code documentation
 
 ## 🔐 Security Notes
 
@@ -234,6 +263,8 @@ For detailed troubleshooting, see [INSTALLATION.md](docs/INSTALLATION.md)
 - 🚨 Box opening detection
 - ⚠️ Motion detection with stabilization
 - 🤖 Telegram bot integration
+- 🔐 Remote arm/disarm control via Telegram
+- 💤 Sleep mode for energy saving
 - 📊 Periodic status reports
 - 🔋 Low power optimization
 

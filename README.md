@@ -5,10 +5,25 @@
 > Proyek ini dibuat sebagai **Tugas Akhir Semester 3** untuk mata kuliah **Organisasi Komputer**
 
 ![Version](https://img.shields.io/badge/version-1.0-blue.svg)
-![Platform](https://img.shields.io/badge/platform-ESP32-green.svg)
+![Platform](https://img.shields.io/badge/platform-ESP32%20%7C%20Pico%20W-green.svg)
 ![License](https://img.shields.io/badge/license-MIT-orange.svg)
 
-Sistem monitoring keamanan real-time untuk kotak/peti penyimpanan menggunakan ESP32 dengan notifikasi Telegram. Mendeteksi pembukaan kotak dan gerakan mencurigakan.
+Sistem monitoring keamanan real-time untuk kotak/peti penyimpanan dengan notifikasi Telegram. Mendeteksi pembukaan kotak dan gerakan mencurigakan. **Mendukung ESP32 dan Raspberry Pi Pico W.**
+
+## 🎯 Platform Support
+
+Proyek ini tersedia dalam **2 versi**:
+
+| Platform | Folder | File Utama | Recommended For |
+|----------|--------|------------|-----------------|
+| **ESP32** | [`Box-Security-Monitoring/`](Box-Security-Monitoring/) | `Box-Security-Monitoring.ino` | Performance, full SSL/TLS |
+| **Raspberry Pi Pico W** | [`raspberry-pi-pico-w/`](raspberry-pi-pico-w/) | `raspberry-pi-pico-w.ino` | Budget, power efficiency |
+
+**Pilih platform sesuai kebutuhan:**
+- 📱 **ESP32** - Lebih cepat, SSL certificate validation, RAM lebih besar
+- 💰 **Pico W** - Lebih murah, hemat daya, mudah ditemukan
+
+> 📖 **Setiap folder memiliki README lengkap dengan instruksi instalasi spesifik platform**
 
 ## ✨ Features
 
@@ -24,6 +39,9 @@ Sistem monitoring keamanan real-time untuk kotak/peti penyimpanan menggunakan ES
 
 ## 📦 Hardware Requirements
 
+### Platform Options
+
+#### Option 1: ESP32 (Recommended for Performance)
 | Component | Specification |
 |-----------|--------------|
 | **Microcontroller** | ESP32 Development Board |
@@ -31,6 +49,31 @@ Sistem monitoring keamanan real-time untuk kotak/peti penyimpanan menggunakan ES
 | **Sensor 2** | KY-027 Mercury Switch |
 | **Power** | USB 5V / Power Bank / Adaptor |
 | **Accessories** | Jumper wires, Magnet |
+
+**Pins:** GPIO 32 (Hall), GPIO 33 (Tilt)
+
+#### Option 2: Raspberry Pi Pico W (Budget Friendly)
+| Component | Specification |
+|-----------|--------------|
+| **Microcontroller** | Raspberry Pi Pico W |
+| **Sensor 1** | KY-003 Hall Effect Sensor |
+| **Sensor 2** | KY-027 Mercury Switch |
+| **Power** | Micro USB 5V / Power Bank |
+| **Accessories** | Jumper wires, Magnet |
+
+**Pins:** GPIO 16 (Hall), GPIO 17 (Tilt)
+
+### 🆚 Platform Comparison
+
+| Feature | ESP32 | Pico W |
+|---------|-------|--------|
+| **Price** | $4-10 | ~$6 |
+| **CPU Speed** | 240 MHz | 133 MHz |
+| **RAM** | 520KB | 264KB |
+| **SSL/TLS** | Full certificate | setInsecure() |
+| **Power (Active)** | 80-150mA | 60-100mA |
+| **Performance** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
+| **Availability** | Good | Better |
 
 ### 🔄 Alternative Sensors (Recommended Upgrades)
 
@@ -84,43 +127,46 @@ Untuk implementasi MPU6050, lihat folder `examples/mpu6050_integration/`
 
 ## 🔧 Quick Start
 
-### 1. Install Arduino IDE & Libraries
+> 📂 **Platform-Specific Instructions:**  
+> - **ESP32:** See [`Box-Security-Monitoring/README.md`](Box-Security-Monitoring/README.md)  
+> - **Pico W:** See [`raspberry-pi-pico-w/README.md`](raspberry-pi-pico-w/README.md)
 
-```bash
-# Install ESP32 Board Support
-Board Manager URL: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+### General Steps (Both Platforms)
 
-# Required Libraries:
-- UniversalTelegramBot (v1.3.0+)
-- ArduinoJson (v6.x)
-```
+#### 1. Install Arduino IDE
+Download from [arduino.cc](https://www.arduino.cc/en/software)
 
-### 2. Hardware Setup
+#### 2. Install Board Support
+- **ESP32:** Add `https://dl.espressif.com/dl/package_esp32_index.json` to Board Manager URLs
+- **Pico W:** Add `https://github.com/earlephilhower/arduino-pico/releases/download/global/package_rp2040_index.json`
 
-```
-ESP32 Pin 32  →  KY-003 Signal
-ESP32 Pin 33  →  KY-027 Signal
-ESP32 3.3V    →  Sensors VCC
-ESP32 GND     →  Sensors GND
-```
+#### 3. Install Libraries (Both Same)
+- **UniversalTelegramBot** (v1.3.0+)
+- **ArduinoJson** (v6.x)
 
-### 3. Configure
+Install via: Tools → Manage Libraries
 
-Edit `config.h`:
+#### 4. Get Telegram Bot Token
+1. Open Telegram, search `@BotFather`
+2. Send `/newbot` and follow instructions
+3. Copy the Bot Token
+4. Send message to your bot
+5. Get Chat ID from `https://api.telegram.org/bot<TOKEN>/getUpdates`
+
+#### 5. Configure
+Edit `config.h` in your platform folder:
 ```cpp
 const char* WIFI_SSID = "Your_WiFi_SSID";
 const char* WIFI_PASSWORD = "Your_WiFi_Password";
-#define TELEGRAM_BOT_TOKEN "xxxxxxx:xxxxxxxxxxxxxxx"
-#define TELEGRAM_CHAT_ID "xxxxxxxxxx"
+#define TELEGRAM_BOT_TOKEN "YOUR_BOT_TOKEN"
+#define TELEGRAM_CHAT_ID "YOUR_CHAT_ID"
 ```
 
-### 4. Upload & Run
+#### 6. Upload
+- **ESP32:** Select "ESP32 Dev Module"
+- **Pico W:** Select "Raspberry Pi Pico W" (hold BOOTSEL first time)
 
-1. Open `Box-Security-Monitoring.ino`
-2. Select Board: ESP32 Dev Module
-3. Select Port
-4. Click Upload
-5. Monitor via Serial Monitor (115200 baud)
+Upload and monitor via Serial (115200 baud)
 
 ## 🎯 How It Works
 

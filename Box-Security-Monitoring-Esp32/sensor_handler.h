@@ -21,6 +21,8 @@ extern bool isMotionActive;
 extern bool motionAlertSent;
 extern bool isBoxOpen;
 extern unsigned long lastBoxOpenAlertTime;
+extern bool securityBreached;
+extern unsigned long lastBreachAlertTime;
 extern bool isSystemArmed;
 
 // ====================================
@@ -43,22 +45,27 @@ void checkBoxOpened(int hallValue) {
     if (currentBoxState) {
       // Kotak baru saja dibuka!
       isBoxOpen = true;
+      securityBreached = true;  // SET FLAG: Keamanan telah dilanggar!
       
       Serial.println("\n╔═══════════════════════════════════╗");
       Serial.println("║  🚨 ALERT: KOTAK TERBUKA!         ║");
+      Serial.println("║  ⚠️  SECURITY BREACHED!           ║");
       Serial.println("╚═══════════════════════════════════╝\n");
       
       // Kirim alert pertama kali
       sendBoxOpenedAlert();
       lastBoxOpenAlertTime = millis();
+      lastBreachAlertTime = millis();
       
     } else {
       // Kotak ditutup kembali
       isBoxOpen = false;
       
       Serial.println("\n✓ Kotak tertutup kembali\n");
+      Serial.println("⚠️  WARNING: Security masih BREACHED!");
+      Serial.println("   Kirim /safe di Telegram untuk reset\n");
       
-      sendBoxClosedNotif();
+      // Tidak kirim notif - hanya log di serial
     }
     
     lastHallState = hallValue;
@@ -106,7 +113,7 @@ void checkBoxMovement(int tiltValue) {
       
       Serial.println("\n✓ Gerakan berhenti - kotak diam\n");
       
-      sendMotionStoppedNotif();
+      // Tidak kirim notif - hanya log di serial
     }
   }
 }

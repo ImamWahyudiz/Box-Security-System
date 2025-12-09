@@ -33,7 +33,7 @@ Proyek ini tersedia dalam **2 versi**:
 - 🤖 **Telegram Bot** - Notifikasi langsung ke smartphone Anda
 - 🔐 **Remote Control** - Arm/Disarm sistem via command Telegram (/arm, /disarm, /sleep)
 - 💤 **Sleep Mode** - Mode hemat energi dengan monitoring dinonaktifkan
-- 📊 **Periodic Reports** - Status report otomatis setiap 30 detik
+- 🔕 **Silent Normal Status** - Hanya kirim notif saat bahaya, tidak spam saat aman
 - 🔋 **Low Power** - Efisien untuk operasi 24/7
 - 🛡️ **Smart Detection** - Anti false alarm dengan stabilization time
 
@@ -194,10 +194,11 @@ Kontrol sistem dari Telegram dengan commands berikut:
 |---------|----------|-------------|
 | `/start` | Help Menu | Tampilkan daftar command |
 | `/help` | Help Menu | Tampilkan daftar command |
-| `/status` | System Status | Cek status sistem (armed/sleep, uptime, WiFi) |
+| `/status` | System Status | Cek status sistem (armed/sleep, uptime, WiFi, breach flag) |
 | `/arm` | Activate | Aktifkan monitoring (sensor dibaca, alert aktif) |
 | `/disarm` | Deactivate | Nonaktifkan monitoring (sleep mode) |
 | `/sleep` | Sleep Mode | Mode hemat energi (sensor tidak dibaca) |
+| `/safe` | Reset Breach | Konfirmasi situasi aman, hentikan alert berulang |
 
 **💡 Tips:**
 - Gunakan `/sleep` saat kotak tidak perlu dipantau (hemat baterai)
@@ -206,16 +207,29 @@ Kontrol sistem dari Telegram dengan commands berikut:
 
 ### 🚨 Alert Types
 
-| Icon | Type | Trigger | Priority |
-|------|------|---------|----------|
-| 🚨 | Box Opened | Magnet moved away | High |
-| ⚠️ | Motion Detected | Box moved/tilted | High |
-| ✅ | Box Closed | Magnet detected back | Normal |
-| ✅ | Motion Stopped | Stable for 3 seconds | Normal |
-| 📊 | Status Report | Every 30 seconds | Low |
+**Bot HANYA mengirim notifikasi saat ada BAHAYA:**
+
+| Icon | Type | Trigger | Sent? |
+|------|------|---------|-------|
+| ⚠️ | **Security Breach** | Box dibuka saat armed | ✅ **YES** (berulang sampai /safe) |
+| 🚨 | **Box Opened** | Magnet moved away | ✅ **YES** (sekali, digantikan breach alert) |
+| ⚠️ | **Motion Detected** | Box moved/tilted | ✅ **YES** |
+| ✅ | Box Closed | Magnet detected back | ❌ NO (silent) |
+| ✅ | Motion Stopped | Stable for 3 seconds | ❌ NO (silent) |
+| 📊 | Status Report | Periodic check | ❌ NO (removed) |
+
+**🔕 Filosofi:** Bot tidak akan spam notifikasi. Hanya kirim alert saat ada ancaman keamanan.
+
+**⚠️ Persistent Breach Alert:**
+- Saat kotak dibuka (sistem armed), flag `securityBreached` diset ke `true`
+- Alert "PELANGGARAN KEAMANAN" terus dikirim setiap 3 detik
+- Alert terus berlanjut **BAHKAN SETELAH KOTAK DITUTUP**
+- User HARUS konfirmasi dengan command `/safe` untuk hentikan alert
+- Ini memastikan breach notification tidak terlewat
 
 ### Example Notifications
 
+**Alert Normal (Box Opened First Time):**
 ```
 🚨 ALERT: KOTAK TERBUKA!
 ━━━━━━━━━━━━━━━━━━━━━
@@ -223,6 +237,32 @@ Kontrol sistem dari Telegram dengan commands berikut:
 ━━━━━━━━━━━━━━━━━━━━━
 ⏰ Waktu: 14:32:15
 ```
+
+**Persistent Breach Alert (Dikirim Berulang):**
+```
+⚠️ PELANGGARAN KEAMANAN!
+
+━━━━━━━━━━━━━━━━━━━━━
+🔓 KOTAK TELAH DIBUKA
+📢 Alert akan terus dikirim
+✅ Gunakan /safe untuk konfirmasi aman
+━━━━━━━━━━━━━━━━━━━━━
+⏰ Waktu: 14:32:18
+```
+
+```
+⚠️ ALERT: KOTAK DIGERAKKAN!
+━━━━━━━━━━━━━━━━━━━━━
+📐 Sensor Tilt: Perubahan posisi
+📦 Status: KOTAK BERGERAK
+━━━━━━━━━━━━━━━━━━━━━
+⏰ Waktu: 14:35:22
+```
+
+**Yang TIDAK akan dikirim (silent):**
+- ✅ Kotak tertutup kembali
+- ✅ Gerakan berhenti
+- 📊 Status report berkala
 
 **Sleep Mode Response:**
 ```

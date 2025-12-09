@@ -22,6 +22,8 @@ extern bool motionAlertSent;
 extern bool isBoxOpen;
 extern unsigned long lastBoxOpenAlertTime;
 extern bool isSystemArmed;
+extern bool securityBreached;
+extern unsigned long lastBreachAlertTime;
 
 // ====================================
 // FUNGSI: CEK KOTAK DIBUKA
@@ -43,9 +45,11 @@ void checkBoxOpened(int hallValue) {
     if (currentBoxState) {
       // Kotak baru saja dibuka!
       isBoxOpen = true;
+      securityBreached = true; // SET FLAG: Keamanan telah dilanggar!
       
       Serial.println("\n╔═══════════════════════════════════╗");
-      Serial.println("║  🚨 ALERT: KOTAK TERBUKA!         ║");
+      Serial.println("║  🚨 SECURITY BREACHED!            ║");
+      Serial.println("║     KOTAK TERBUKA!                ║");
       Serial.println("╚═══════════════════════════════════╝\n");
       
       // Kirim alert pertama kali
@@ -56,9 +60,10 @@ void checkBoxOpened(int hallValue) {
       // Kotak ditutup kembali
       isBoxOpen = false;
       
-      Serial.println("\n✓ Kotak tertutup kembali\n");
+      Serial.println("\n✓ Kotak tertutup kembali");
+      Serial.println("⚠️ FLAG BREACH masih aktif - gunakan /safe\n");
       
-      sendBoxClosedNotif();
+      // Tidak kirim notif - hanya log di serial
     }
     
     lastHallState = hallValue;
@@ -106,7 +111,7 @@ void checkBoxMovement(int tiltValue) {
       
       Serial.println("\n✓ Gerakan berhenti - kotak diam\n");
       
-      sendMotionStoppedNotif();
+      // Tidak kirim notif - hanya log di serial
     }
   }
 }

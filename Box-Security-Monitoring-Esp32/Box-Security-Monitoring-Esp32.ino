@@ -65,6 +65,8 @@ bool motionAlertSent = false;
 // Tracking kotak terbuka
 bool isBoxOpen = false;
 unsigned long lastBoxOpenAlertTime = 0;
+bool securityBreached = false;  // Flag: pernah dibuka saat armed
+unsigned long lastBreachAlertTime = 0;
 
 // Sistem arm/disarm
 bool isSystemArmed = true;  // Default: sistem aktif
@@ -144,8 +146,13 @@ void loop() {
     if (isWiFiConnected()) {
       checkBoxOpened(hallValue);
       
-      // Kirim alert berulang jika kotak masih terbuka
-      if (isBoxOpen && (millis() - lastBoxOpenAlertTime > BOX_OPEN_ALERT_INTERVAL)) {
+      // PRIORITY: Kirim alert breach berulang sampai user konfirmasi /safe
+      if (securityBreached && (millis() - lastBreachAlertTime > BOX_OPEN_ALERT_INTERVAL)) {
+        sendSecurityBreachAlert();
+        lastBreachAlertTime = millis();
+      }
+      // Jika tidak breach, cek alert biasa untuk kotak terbuka
+      else if (isBoxOpen && !securityBreached && (millis() - lastBoxOpenAlertTime > BOX_OPEN_ALERT_INTERVAL)) {
         sendBoxOpenedAlert();
         lastBoxOpenAlertTime = millis();
       }
@@ -153,11 +160,7 @@ void loop() {
       // Monitoring gerakan kotak (perubahan tilt)
       checkBoxMovement(tiltValue);
       
-      // Kirim report berkala
-      if (millis() - lastReportTime > REPORT_INTERVAL) {
-        sendPeriodicReport(hallValue, tiltValue, isMotionActive);
-        lastReportTime = millis();
-      }
+      // Report berkala DIHAPUS - hanya kirim saat ada bahaya
     }
     
     delay(SENSOR_READ_DELAY);

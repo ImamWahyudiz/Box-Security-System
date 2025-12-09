@@ -17,6 +17,8 @@
 extern WiFiClientSecure secured_client;
 extern UniversalTelegramBot bot;
 extern bool isSystemArmed;
+extern bool securityBreached;
+extern unsigned long lastBreachAlertTime;
 
 // ====================================
 // FUNGSI: KIRIM MENU HELP
@@ -29,12 +31,13 @@ void sendHelpMenu() {
   message += "/arm - Aktifkan monitoring\n";
   message += "/disarm - Nonaktifkan (sleep)\n";
   message += "/sleep - Mode hemat energi\n";
+  message += "/safe - Konfirmasi situasi aman\n";
   message += "/help - Tampilkan menu ini\n";
   message += "━━━━━━━━━━━━━━━━━━━━━\n";
-  message += "💡 Sleep Mode:\n";
-  message += "• Sensor tidak dibaca\n";
-  message += "• Hemat energi\n";
-  message += "• Tetap bisa di-arm kembali";
+  message += "⚠️ Security Breach:\n";
+  message += "• Jika kotak pernah dibuka\n";
+  message += "• Alert terus dikirim\n";
+  message += "• Gunakan /safe untuk reset";
   
   bot.sendMessage(TELEGRAM_CHAT_ID, message, "");
 }
@@ -47,6 +50,15 @@ void sendSystemStatus() {
   message += "━━━━━━━━━━━━━━━━━━━━━\n";
   message += "🔒 Mode: ";
   message += isSystemArmed ? "ARMED ✓" : "DISARMED (Sleep) 💤";
+  
+  if (securityBreached) {
+    message += "\n⚠️ SECURITY: BREACHED! 🚨";
+    message += "\n❗ Kotak telah dibuka!";
+    message += "\n📝 Kirim /safe untuk reset";
+  } else {
+    message += "\n✅ SECURITY: Safe";
+  }
+  
   message += "\n⏰ Uptime: " + getFormattedUptime();
   message += "\n📶 WiFi: " + String(WiFi.RSSI()) + " dBm";
   message += "\n━━━━━━━━━━━━━━━━━━━━━";
@@ -89,6 +101,15 @@ void handleTelegramMessages() {
       isSystemArmed = false;
       bot.sendMessage(TELEGRAM_CHAT_ID, "💤 Sistem DISARMED\n\n🔓 Mode sleep - hemat energi\n🔇 Sensor tidak dibaca\n⚡ Konsumsi daya minimal\n\nKetik /arm untuk aktifkan kembali", "");
       Serial.println("✓ Sistem DISARMED via Telegram - masuk mode hemat energi");
+    }
+    else if (text == "/safe") {
+      if (securityBreached) {
+        securityBreached = false;
+        bot.sendMessage(TELEGRAM_CHAT_ID, "✅ SITUASI DIKONFIRMASI AMAN\n\n🔓 Security breach direset\n📊 Sistem kembali normal\n🔒 Monitoring tetap aktif", "");
+        Serial.println("✓ Security breach direset via /safe command");
+      } else {
+        bot.sendMessage(TELEGRAM_CHAT_ID, "ℹ️ Tidak ada security breach\n\nSistem sudah dalam kondisi aman", "");
+      }
     }
     else {
       bot.sendMessage(TELEGRAM_CHAT_ID, "❓ Command tidak dikenal\n\nKetik /help untuk melihat daftar command", "");
@@ -135,6 +156,22 @@ void sendBoxOpenedAlert() {
   message += "⏰ " + getFormattedTime();
   
   bot.sendMessage(TELEGRAM_CHAT_ID, message, "");
+}
+
+// ====================================
+// FUNGSI: KIRIM ALERT PELANGGARAN KEAMANAN
+// ====================================
+void sendSecurityBreachAlert() {
+  String message = "⚠️ PELANGGARAN KEAMANAN!\n\n";
+  message += "━━━━━━━━━━━━━━━━━━━━━\n";
+  message += "🔓 KOTAK TELAH DIBUKA\n";
+  message += "📢 Alert akan terus dikirim\n";
+  message += "✅ Gunakan /safe untuk konfirmasi aman\n";
+  message += "━━━━━━━━━━━━━━━━━━━━━\n";
+  message += "⏰ " + getFormattedTime();
+  
+  bot.sendMessage(TELEGRAM_CHAT_ID, message, "");
+  lastBreachAlertTime = millis();
 }
 
 // ====================================

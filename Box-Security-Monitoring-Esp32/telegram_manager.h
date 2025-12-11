@@ -46,21 +46,66 @@ void sendHelpMenu() {
 // FUNGSI: KIRIM STATUS SISTEM
 // ====================================
 void sendSystemStatus() {
-  String message = "📊 STATUS SISTEM\n\n";
+  // Baca sensor real-time
+  int hallValue = digitalRead(PIN_HALL_SENSOR);
+  int tiltValue = digitalRead(PIN_TILT_SENSOR);
+  
+  String message = "📊 STATUS SISTEM LENGKAP\n\n";
   message += "━━━━━━━━━━━━━━━━━━━━━\n";
+  
+  // System Mode
   message += "🔒 Mode: ";
   message += isSystemArmed ? "ARMED ✓" : "DISARMED (Sleep) 💤";
   
+  // Security Breach Status
+  message += "\n⚠️ Security Breach: ";
   if (securityBreached) {
-    message += "\n⚠️ SECURITY: BREACHED! 🚨";
-    message += "\n❗ Kotak telah dibuka!";
-    message += "\n📝 Kirim /safe untuk reset";
+    message += "ACTIVE! 🚨\n";
+    message += "❗ Kotak telah dibuka!\n";
+    message += "📝 Kirim /safe untuk reset";
   } else {
-    message += "\n✅ SECURITY: Safe";
+    message += "Clear ✓";
   }
   
-  message += "\n⏰ Uptime: " + getFormattedUptime();
-  message += "\n📶 WiFi: " + String(WiFi.RSSI()) + " dBm";
+  // Sensor Status
+  message += "\n\n📡 SENSOR STATUS:\n";
+  message += "━━━━━━━━━━━━━━━━━━━━━\n";
+  message += "📬 Hall Sensor (KY-003):\n";
+  message += "  • Pin: GPIO " + String(PIN_HALL_SENSOR) + "\n";
+  message += "  • Value: " + String(hallValue) + "\n";
+  message += "  • Status: ";
+  #if HALL_SENSOR_INVERTED
+    message += (hallValue == HIGH) ? "Tertutup ✓" : "Terbuka ⚠️";
+  #else
+    message += (hallValue == LOW) ? "Tertutup ✓" : "Terbuka ⚠️";
+  #endif
+  
+  message += "\n\n📐 Tilt Sensor (KY-027):\n";
+  message += "  • Pin: GPIO " + String(PIN_TILT_SENSOR) + "\n";
+  message += "  • Value: " + String(tiltValue) + "\n";
+  message += "  • Motion: ";
+  extern bool isMotionActive;
+  message += isMotionActive ? "AKTIF ⚠️" : "Diam ✓";
+  
+  // System Info
+  message += "\n\n⚙️ SYSTEM INFO:\n";
+  message += "━━━━━━━━━━━━━━━━━━━━━\n";
+  message += "⏰ Uptime: " + getFormattedUptime() + "\n";
+  message += "🕐 Time: " + getFormattedTime();
+  
+  // WiFi Info
+  message += "\n\n📶 WiFi: Connected\n";
+  message += "  • SSID: " + String(WIFI_SSID) + "\n";
+  message += "  • IP: " + WiFi.localIP().toString() + "\n";
+  message += "  • RSSI: " + String(WiFi.RSSI()) + " dBm";
+  
+  // Platform Info
+  message += "\n\n🖥️ PLATFORM:\n";
+  message += "━━━━━━━━━━━━━━━━━━━━━\n";
+  message += "• ESP32 Development Board\n";
+  message += "• Hall + Tilt Sensors\n";
+  message += "• Arduino Framework";
+  
   message += "\n━━━━━━━━━━━━━━━━━━━━━";
   
   bot.sendMessage(TELEGRAM_CHAT_ID, message, "");
@@ -152,8 +197,7 @@ void sendBoxOpenedAlert() {
   String message = "🚨 ALERT: KOTAK TERBUKA!\n\n";
   message += "━━━━━━━━━━━━━━━━━━━━━\n";
   message += "📬 Status: TERBUKA\n";
-  message += "━━━━━━━━━━━━━━━━━━━━━\n";
-  message += "⏰ " + getFormattedTime();
+  message += "🕐 " + getFormattedTime();
   
   bot.sendMessage(TELEGRAM_CHAT_ID, message, "");
 }
@@ -163,12 +207,10 @@ void sendBoxOpenedAlert() {
 // ====================================
 void sendSecurityBreachAlert() {
   String message = "⚠️ PELANGGARAN KEAMANAN!\n\n";
-  message += "━━━━━━━━━━━━━━━━━━━━━\n";
   message += "🔓 KOTAK TELAH DIBUKA\n";
   message += "📢 Alert akan terus dikirim\n";
   message += "✅ Gunakan /safe untuk konfirmasi aman\n";
-  message += "━━━━━━━━━━━━━━━━━━━━━\n";
-  message += "⏰ " + getFormattedTime();
+  message += "🕐 " + getFormattedTime();
   
   bot.sendMessage(TELEGRAM_CHAT_ID, message, "");
   lastBreachAlertTime = millis();
@@ -189,11 +231,9 @@ void sendBoxClosedNotif() {
 // ====================================
 void sendMotionAlert() {
   String message = "⚠️ ALERT: KOTAK DIGERAKKAN!\n\n";
-  message += "━━━━━━━━━━━━━━━━━━━━━\n";
   message += "📐 Sensor Tilt: Perubahan posisi\n";
   message += "📦 Status: KOTAK BERGERAK\n";
-  message += "━━━━━━━━━━━━━━━━━━━━━\n";
-  message += "⏰ " + getFormattedTime();
+  message += "🕐 " + getFormattedTime();
   
   bot.sendMessage(TELEGRAM_CHAT_ID, message, "");
 }

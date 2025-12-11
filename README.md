@@ -15,13 +15,13 @@ Sistem monitoring keamanan real-time untuk kotak/peti penyimpanan dengan notifik
 Proyek ini tersedia dalam **2 versi**:
 
 | Platform | Folder | File Utama | Recommended For |
-|----------|--------|------------|-----------------|
-| **ESP32** | [`Box-Security-Monitoring/`](Box-Security-Monitoring/) | `Box-Security-Monitoring.ino` | Performance, full SSL/TLS |
-| **Raspberry Pi Pico W** | [`raspberry-pi-pico-w/`](raspberry-pi-pico-w/) | `raspberry-pi-pico-w.ino` | Budget, power efficiency |
+|----------|--------|------------|-----------------||
+| **ESP32** | [`Box-Security-Monitoring-Esp32/`](Box-Security-Monitoring-Esp32/) | `Box-Security-Monitoring-Esp32.ino` | Performance, dual sensors |
+| **Raspberry Pi Pico 2 W (Python)** | [`raspberry-pi-pico-2w-python/`](raspberry-pi-pico-2w-python/) | `main.py` | Budget, MicroPython, tilt only |
 
 **Pilih platform sesuai kebutuhan:**
-- 📱 **ESP32** - Lebih cepat, SSL certificate validation, RAM lebih besar
-- 💰 **Pico W** - Lebih murah, hemat daya, mudah ditemukan
+- 📱 **ESP32** - Dual sensor (Hall + Tilt), C++/Arduino, performa tinggi
+- 💰 **Pico 2 W** - Single sensor (Tilt only), MicroPython, hemat daya, mudah dimodifikasi
 
 > 📖 **Setiap folder memiliki README lengkap dengan instruksi instalasi spesifik platform**
 
@@ -50,30 +50,35 @@ Proyek ini tersedia dalam **2 versi**:
 | **Power** | USB 5V / Power Bank / Adaptor |
 | **Accessories** | Jumper wires, Magnet |
 
-**Pins:** GPIO 32 (Hall), GPIO 33 (Tilt)
-
-#### Option 2: Raspberry Pi Pico W (Budget Friendly)
-| Component | Specification |
-|-----------|--------------|
-| **Microcontroller** | Raspberry Pi Pico W |
-| **Sensor 1** | KY-003 Hall Effect Sensor |
-| **Sensor 2** | KY-027 Mercury Switch |
-| **Power** | Micro USB 5V / Power Bank |
-| **Accessories** | Jumper wires, Magnet |
-
 **Pins:** GPIO 16 (Hall), GPIO 17 (Tilt)
+
+#### Option 2: Raspberry Pi Pico 2 W (Budget Friendly - Tilt Only)
+| Component | Specification |
+|-----------|--------------||
+| **Microcontroller** | Raspberry Pi Pico 2 W |
+| **Sensor** | KY-027 Mercury Switch (Tilt only) |
+| **Power** | Micro USB 5V / Power Bank |
+| **Accessories** | Jumper wires |
+| **Language** | MicroPython |
+| **IDE** | Thonny |
+
+**Pins:** GPIO 17 (Tilt)
+
+**Note:** Hall sensor tidak digunakan karena GPIO compatibility issue di RP2350 chip
 
 ### 🆚 Platform Comparison
 
-| Feature | ESP32 | Pico W |
-|---------|-------|--------|
+| Feature | ESP32 | Pico 2 W |
+|---------|-------|----------|
 | **Price** | $4-10 | ~$6 |
-| **CPU Speed** | 240 MHz | 133 MHz |
+| **CPU Speed** | 240 MHz | 150 MHz |
 | **RAM** | 520KB | 264KB |
-| **SSL/TLS** | Full certificate | setInsecure() |
-| **Power (Active)** | 80-150mA | 60-100mA |
+| **Language** | C++/Arduino | MicroPython |
+| **Sensors** | Hall + Tilt | Tilt only |
+| **SSL/TLS** | Full HTTPS | HTTPS |
+| **Power (Active)** | 150-200mA | 100-150mA |
 | **Performance** | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ |
-| **Availability** | Good | Better |
+| **Ease of Code** | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
 
 ### 🔄 Alternative Sensors (Recommended Upgrades)
 
@@ -128,8 +133,8 @@ Untuk implementasi MPU6050, lihat folder `examples/mpu6050_integration/`
 ## 🔧 Quick Start
 
 > 📂 **Platform-Specific Instructions:**  
-> - **ESP32:** See [`Box-Security-Monitoring/README.md`](Box-Security-Monitoring/README.md)  
-> - **Pico W:** See [`raspberry-pi-pico-w/README.md`](raspberry-pi-pico-w/README.md)
+> - **ESP32:** See [`Box-Security-Monitoring-Esp32/README.md`](Box-Security-Monitoring-Esp32/README.md)  
+> - **Pico 2 W:** See [`raspberry-pi-pico-2w-python/README.md`](raspberry-pi-pico-2w-python/README.md)
 
 ### General Steps (Both Platforms)
 
@@ -194,7 +199,7 @@ Kontrol sistem dari Telegram dengan commands berikut:
 |---------|----------|-------------|
 | `/start` | Help Menu | Tampilkan daftar command |
 | `/help` | Help Menu | Tampilkan daftar command |
-| `/status` | System Status | Cek status sistem (armed/sleep, uptime, WiFi, breach flag) |
+| `/status` | System Status | Status lengkap: mode, breach, sensor real-time, motion, uptime, WiFi, platform info |
 | `/arm` | Activate | Aktifkan monitoring (sensor dibaca, alert aktif) |
 | `/disarm` | Deactivate | Nonaktifkan monitoring (sleep mode) |
 | `/sleep` | Sleep Mode | Mode hemat energi (sensor tidak dibaca) |
@@ -232,37 +237,72 @@ Kontrol sistem dari Telegram dengan commands berikut:
 **Alert Normal (Box Opened First Time):**
 ```
 🚨 ALERT: KOTAK TERBUKA!
+
 ━━━━━━━━━━━━━━━━━━━━━
 📬 Status: TERBUKA
-━━━━━━━━━━━━━━━━━━━━━
-⏰ Waktu: 14:32:15
+🕐 14:32:15
 ```
 
 **Persistent Breach Alert (Dikirim Berulang):**
 ```
 ⚠️ PELANGGARAN KEAMANAN!
 
-━━━━━━━━━━━━━━━━━━━━━
 🔓 KOTAK TELAH DIBUKA
 📢 Alert akan terus dikirim
 ✅ Gunakan /safe untuk konfirmasi aman
-━━━━━━━━━━━━━━━━━━━━━
-⏰ Waktu: 14:32:18
+🕐 14:32:18
 ```
 
 ```
 ⚠️ ALERT: KOTAK DIGERAKKAN!
-━━━━━━━━━━━━━━━━━━━━━
+
 📐 Sensor Tilt: Perubahan posisi
 📦 Status: KOTAK BERGERAK
-━━━━━━━━━━━━━━━━━━━━━
-⏰ Waktu: 14:35:22
+🕐 14:35:22
 ```
 
 **Yang TIDAK akan dikirim (silent):**
 - ✅ Kotak tertutup kembali
 - ✅ Gerakan berhenti
 - 📊 Status report berkala
+
+**Status Command Output (/status):**
+```
+📊 STATUS SISTEM LENGKAP
+
+━━━━━━━━━━━━━━━━━━━━━
+🔒 Mode: ARMED ✓
+⚠️ Security Breach: Clear ✓
+
+📡 SENSOR STATUS:
+━━━━━━━━━━━━━━━━━━━━━
+📬 Hall Sensor (KY-003):
+  • Pin: GPIO 16
+  • Value: 1
+  • Status: Tertutup ✓
+
+📐 Tilt Sensor (KY-027):
+  • Pin: GPIO 17
+  • Value: 1
+  • Motion: Diam ✓
+
+⚙️ SYSTEM INFO:
+━━━━━━━━━━━━━━━━━━━━━
+⏰ Uptime: 00:15:23
+🕐 Time: 14:30:45
+
+📶 WiFi: Connected
+  • SSID: MyWiFi
+  • IP: 192.168.1.100
+  • RSSI: -45 dBm
+
+🖥️ PLATFORM:
+━━━━━━━━━━━━━━━━━━━━━
+• ESP32 Development Board
+• Hall + Tilt Sensors
+• Arduino Framework
+━━━━━━━━━━━━━━━━━━━━━
+```
 
 **Sleep Mode Response:**
 ```
@@ -288,9 +328,16 @@ Ketik /arm untuk aktifkan kembali
 
 ### Pin Configuration
 
+**ESP32:**
 ```cpp
-#define PIN_HALL_SENSOR 32    // KY-003 Hall Sensor
-#define PIN_TILT_SENSOR 33    // KY-027 Tilt Sensor
+#define PIN_HALL_SENSOR 16    // KY-003 Hall Sensor
+#define PIN_TILT_SENSOR 17    // KY-027 Tilt Sensor
+```
+
+**Pico 2 W (Python):**
+```python
+PIN_TILT_SENSOR = 17          # GPIO 17 - Tilt only
+# PIN_HALL_SENSOR tidak digunakan
 ```
 
 ## 🐛 Troubleshooting
